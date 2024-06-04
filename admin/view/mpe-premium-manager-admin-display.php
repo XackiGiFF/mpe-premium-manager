@@ -1,4 +1,22 @@
+<div style="margin-left: 10%">
+    <div style="max-width: 80%; margin: 20px;">
+        <h1>MPE Premium Manager: <small>Manage Users</small></h1>
+        <p>Система управления премиальными аккаунтами, датой окончания премиума, количество дней до окончания</p>
+
 <?php
+// Теперь вам нужно будет обновить $current_page и $per_page на основе GET-параметров
+$current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+$per_page = isset($_GET['per_page']) ? max(1, intval($_GET['per_page'])) : 20;
+// вызываем функцию с параметром сортировки
+$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'default';
+
+// Для получения текущей страницы из URL, если параметр paged установлен
+if(!empty($_GET['paged'])) {
+    $current_page = filter_input(INPUT_GET, 'paged', FILTER_VALIDATE_INT);
+    MPEPremiumManagerAdmin::display_premium_users_table($current_page, $per_page, $sort_order);
+} else {
+    MPEPremiumManagerAdmin::display_premium_users_table();
+}
 
 // Проверки безопасности
 if (isset($_POST['submit'])) {
@@ -84,4 +102,7 @@ $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
 
         <?php submit_button('Обновить статус'); ?>
     </form>
+</div>
+
+    </div>
 </div>
