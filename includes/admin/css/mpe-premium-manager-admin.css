@@ -1,0 +1,15 @@
+.wp-list-table th {
+    background-color: #f1f1f1;
+    color: #23282d;
+}
+.wp-list-table td,
+.wp-list-table th {
+    border: 1px solid #e1e1e1;
+    padding: 8px 10px;
+}
+.wp-list-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.wp-list-table tr:hover {
+    background-color: #f1f1f1;
+}
