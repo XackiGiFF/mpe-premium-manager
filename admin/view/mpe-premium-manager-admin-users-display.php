@@ -1,3 +1,4 @@
+global$mpe_premium_manager;
 <div style="margin-left: 10%">
     <div style="max-width: 80%; margin: 20px;">
         <h1>MPE Premium Manager: <small>Manage Users</small></h1>
@@ -95,10 +96,11 @@ $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
                 <th><label for="premium_end_date">Дата окончания премиума</label></th>
                 <td>
                     <?php
+                    global $mpe_premium_manager;
                     // Предполагается, что мы получаем мета значение для выбранного пользователя. Если у пользователя уже есть дата, используйте её, иначе - используйте текущую дату.
                     $premium_end_date = $user_id ? get_user_meta($user_id,'premium_end_date') : '';
                     $premium_end_date = get_user_meta($user_id, 'premium_end_date', true) ?? date('Y-m-d');
-                    $remaining_days = $user_id ? mpe_calculate_remaining_days($premium_end_date) : 0;
+                    $remaining_days = $user_id ? $mpe_premium_manager->get_premium_remaining_days($user_id) : 0;
                     ?>
                     <input name="premium_end_date" id="premium_end_date" type="date" value="<?php echo esc_attr($premium_end_date); ?>" class="regular-text" />
                     <p>Оставшиеся дни до окончания: <span id="premium_remaining_days"><?php echo esc_html($remaining_days); ?></span></p>

@@ -3,7 +3,7 @@
 Plugin Name: Mpe Premium Manager
 Plugin URI: http://github.com/XackiGiFF/mpe-premium-manager
 Description: Manage premium status, expiration date, and remaining days for users.
-Version: 1.0.2
+Version: 1.1.0
 Author: XackiGiFF
 Author URI: http://github.com/XackiGiFF
 License: A "Slug" license name e.g. GPL2
@@ -15,10 +15,6 @@ Text Domain: mpe-premium-manager
 Domain Path: /languages
 
 */
-
-use XackiGiFF\PremiumManager\MPEPremiumManager;
-use XackiGiFF\PremiumManager\MPEPremiumManagerActivate;
-use XackiGiFF\PremiumManager\MPEPremiumManagerDeactivate;
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
@@ -33,7 +29,12 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 /* End Debugging */
 
-$mpe_premium_manager = null;
+require_once(MPE_PREMIUM_MANAGER_DIR . 'public/view/class-mpe-premium-manager-public-display.php');
+use XackiGiFF\PremiumManager\public\view\MPEPremiumManagerPublicDisplay;
+use XackiGiFF\PremiumManager\MPEPremiumManager;
+use XackiGiFF\PremiumManager\MPEPremiumManagerActivate;
+use XackiGiFF\PremiumManager\MPEPremiumManagerDeactivate;
+
 
 // Activation hook for setting up the plugin environment
 function mpe_premium_manager_activate(): void
@@ -64,7 +65,7 @@ function mpe_premium_manager_deactivate(): void
 {
 
     // Include the admin panel file
-    require_once(MPE_PREMIUM_MANAGER_DIR . 'includes/class-mpe-premium-manager-activate.php');
+    require_once(MPE_PREMIUM_MANAGER_DIR . 'includes/class-mpe-premium-manager-deactivate.php');
 
     wp_clear_scheduled_hook('deactivate_expired_premiums_hook');
     // Deactivate the plugin
@@ -148,20 +149,61 @@ function handle_get_user_premium_data()
 
 add_action('wp_ajax_get_user_premium_data', 'handle_get_user_premium_data');
 
+function mpe_premium_manager_add_premium_shortcode() {
+    // Проверяем, авторизован ли пользователь
+    if (!is_user_logged_in()) {
+        return "Пожалуйста, войдите в систему, чтобы обновить свой премиум статус.";
+    }
 
-// Вызов кастомного хука добавления премиума
-add_action('init', function() {
-    $user_id = 1; // ID пользователя
-    $days = 150; // Количество дней премиума
+    // Получаем ID текущего пользователя
+    $user_id = get_current_user_id();
+
+    // Извлекаем количество дней из настроек плагина
+    $days = intval(get_option('mpe_premium_manager_days', 150));
 
     // Вызов кастомного хука
     do_action('mpe_premium_manager_add_premium', $user_id, $days);
-});
 
-// Вызов кастомного хука удаления премиума
-add_action('init', function() {
-    $user_id = 1; // ID пользователя
+    // Получаем сообщение об успешном обновлении из настроек плагина
+    $success_message_template = get_option('mpe_premium_manager_success_message', 'Your premium status has been updated for {days} days.');
 
-    // Вызов кастомного хука
-    do_action('mpe_premium_manager_del_premium', $user_id);
-});
+    // Замена плейсхолдера {days} на фактическое значение
+    $success_message = str_replace('{days}', $days, $success_message_template);
+
+    // Возвращаем сообщение пользователю
+    return $success_message;
+}
+
+add_shortcode('mpe_premium_manager_add_premium', 'mpe_premium_manager_add_premium_shortcode');
+
+function mpe_premium_manager_add_premium_user_details() {
+    global $mpe_premium_manager;
+    $template = "";
+    $user_id = get_current_user_id();
+    if(!$mpe_premium_manager->is_premium_active($user_id)) {
+        $link = get_option('mpe_premium_manager_link_on_premium', '/lk/');
+        $link_text = get_option('mpe_premium_manager_link_on_premium_text', 'Premium');
+        $template_standart = MPEPremiumManagerPublicDisplay::get_template('standart');
+
+        $mpe_premium_manager_template = get_option('mpe_premium_manager_template_standart', $template_standart);
+        $template =str_replace(
+            ['{link}', '{link_text}'],
+            [$link, $link_text],
+            $mpe_premium_manager_template,
+        );
+
+    } else {
+        $date = $mpe_premium_manager->get_premium_date($user_id);
+        $remaining_days = $mpe_premium_manager->get_premium_remaining_days($user_id);
+        $template_premium = MPEPremiumManagerPublicDisplay::get_template('premium');
+
+        $mpe_premium_manager_template = get_option('mpe_premium_manager_template_premium', $template_premium);
+        $template = str_replace(
+            ['{date}', '{remaining_days}'],
+            [$date, $remaining_days],
+            $mpe_premium_manager_template);
+    }
+    return $template;
+}
+
+add_shortcode('mpe_premium_manager_user_details', 'mpe_premium_manager_add_premium_user_details');

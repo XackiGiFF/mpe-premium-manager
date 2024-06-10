@@ -2,6 +2,8 @@
 
 namespace XackiGiFF\PremiumManager;
 
+use DateTime;
+use Exception;
 use XackiGiFF\PremiumManager\public\MPEPremiumManagerPublic;
 use XackiGiFF\PremiumManager\admin\MPEPremiumManagerAdmin;
 
@@ -88,5 +90,37 @@ class MPEPremiumManager {
     {
         update_user_meta($user_id, 'premium_end_date', '');
         update_user_meta($user_id, 'premium_status', 'inactive');
+    }
+
+    /**
+     * Показывает оставшееся количество дней до окончания премиума у пользователя.
+     * @param $user_id
+     * @return bool|int
+     * @throws Exception
+     */
+    function get_premium_remaining_days($user_id): bool|int
+    {
+        $end_date_str = get_user_meta($user_id, 'premium_end_date', true);
+        if ($end_date_str) {
+            $end_date = new DateTime($end_date_str);
+            $current_date = new DateTime();
+            if($current_date > $end_date) {
+                return 0; // Premium status has expired.
+            } else {
+                return $current_date->diff($end_date)->days;
+            }
+        } else {
+            return 0; // Premium status is not set.
+        }
+    }
+
+    /**
+     * Возвращает дату окончания премиума у пользователя.
+     * @param int $user_id
+     * @return string
+     */
+    public function get_premium_date(int $user_id): string
+    {
+        return get_user_meta($user_id, 'premium_end_date', true);
     }
 }
