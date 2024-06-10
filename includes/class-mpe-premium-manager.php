@@ -98,7 +98,7 @@ class MPEPremiumManager {
      * @return bool|int
      * @throws Exception
      */
-    function get_premium_remaining_days($user_id): bool|int
+    public function get_premium_remaining_days($user_id): bool|int
     {
         $end_date_str = get_user_meta($user_id, 'premium_end_date', true);
         if ($end_date_str) {

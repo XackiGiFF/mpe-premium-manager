@@ -27,7 +27,19 @@
 
 ## Shortcodes
 
-### Display Premium Status
+### Inserting Automated Premium Grant Code
+
+[mpe_premium_manager_add_premium]
+
+Add this to the payment confirmation page to insert the automated premium grant code.
+
+### Displaying Premium Status Information
+
+[mpe_premium_manager_user_details]
+
+Add this to the user page to display information about the user's premium status.
+
+### Display Premium Status (in Future)
 
 ```shortcode
 [mpe_premium_status]
@@ -70,28 +82,63 @@ if ($premium_status === 'on' && strtotime($premium_end_date) > time()) {
 }
 ```
 
-## Methods in `MPEPremiumManager` Class
+### Methods of the MPEPremiumManager Class
 
-### Get Remaining Days
-
+### Adding Premium Status
 ```php
-MPEPremiumManager::get_remaining_days($user_id);
+/**
+ * Issue premium status to the user for a specified number of days.
+ * @param int $user_id
+ * @param int $days
+ * @return void
+ */
+MPEPremiumManager::add_premium(int $user_id, int $days): void;
 ```
-Returns the number of days remaining in the user's premium status.
+Issue premium status to the user for a specified number of days.
 
-### Get Premium End Date
-
+### Deleting Premium Status
 ```php
-MPEPremiumManager::get_premium_end_date($user_id);
+/**
+ * Remove premium status from the user.
+ * @param int $user_id
+ * @return void
+ */
+MPEPremiumManager::del_premium(int $user_id): void;
 ```
-Returns the end date of the user's premium status.
+Remove premium status from the user.
 
-### Get Premium Status
-
+### Checking Premium Status Activity
 ```php
-MPEPremiumManager::get_premium_status($user_id);
+/**
+ * Check if the user's premium status is active.
+ * @param int $user_id
+ * @return bool
+ */
+MPEPremiumManager::is_premium_active(int $user_id): bool;
 ```
-Checks if the user is currently a premium member.
+Check if the user's premium status is active.
+
+### Getting Remaining Premium Days
+```php
+/**
+ * Return the number of remaining premium days for the user.
+ * @param int $user_id
+ * @return bool|int
+ */
+MPEPremiumManager::get_premium_remaining_days(int $user_id): bool|int;
+```
+Return the number of remaining premium days for the user.
+
+### Getting Premium Expiry Date
+```php
+/**
+ * Return the expiry date of the user's premium status.
+ * @param int $user_id
+ * @return string
+ */
+MPEPremiumManager::get_premium_date(int $user_id): string;
+```
+Return the expiry date of the user's premium status.
 
 ## Automatic Premium Status Check
 
@@ -155,6 +202,22 @@ Author: [XackiGiFF](https://github.com/XackiGiFF)
 
 ## Шорткоды
 
+### Вставка автоматизированного кода выдачи премиума
+
+```shortcode
+[mpe_premium_manager_add_premium]
+```
+Добавляется на страницу подтверждения платежа для вставки автоматизированного кода выдачи премиума.
+
+### Вывод информации о статусе премиума
+
+```shortcode
+[mpe_premium_manager_user_details]
+```
+Добавляется на страницу пользователя для вывода информации о статусе премиума.
+
+## Шорткоды (В будущем)
+
 ### Отображение премиум-статуса
 
 ```shortcode
@@ -200,26 +263,66 @@ if ($premium_status === 'on' && strtotime($premium_end_date) > time()) {
 
 ## Методы класса `MPEPremiumManager`
 
-### Получение оставшихся дней
+### Добавление премиум-статуса
 
 ```php
-MPEPremiumManager::get_remaining_days($user_id);
+/**
+ * Выдача премиума пользователю на заданное количество дней.
+ * @param int $user_id
+ * @param int $days
+ * @return void
+ */
+MPEPremiumManager::add_premium(int $user_id, int $days): void;
+```
+Выдача премиума пользователю на заданное количество дней.
+
+### Удаление премиум-статуса
+
+```php
+/**
+ * Удаление премиума у пользователя.
+ * @param int $user_id
+ * @return void
+ */
+MPEPremiumManager::del_premium(int $user_id): void;
+```
+Удаление премиума у пользователя.
+
+### Проверка активности премиум-статуса
+
+```php
+/**
+ * Проверка, активен ли премиум у пользователя.
+ * @param int $user_id
+ * @return bool
+ */
+MPEPremiumManager::is_premium_active(int $user_id): bool;
+```
+Проверка, активен ли премиум у пользователя.
+
+### Получение оставшихся дней премиум-статуса
+
+```php
+/**
+ * Возвращает количество оставшихся дней премиум-статуса пользователя.
+ * @param int $user_id
+ * @return bool|int
+ */
+MPEPremiumManager::get_premium_remaining_days(int $user_id): bool|int;
 ```
 Возвращает количество оставшихся дней премиум-статуса пользователя.
 
-### Получение даты окончания премиум-статуса
+### Получение даты окончания премиума
 
 ```php
-MPEPremiumManager::get_premium_end_date($user_id);
+/**
+ * Возвращает дату окончания премиума у пользователя.
+ * @param int $user_id
+ * @return string
+ */
+MPEPremiumManager::get_premium_date(int $user_id): string;
 ```
-Возвращает дату окончания премиум-статуса пользователя.
-
-### Проверка премиум-статуса
-
-```php
-MPEPremiumManager::get_premium_status($user_id);
-```
-Проверяет, является ли пользователь текущим премиум-участником.
+Возвращает дату окончания премиума у пользователя.
 
 ## Автоматическая проверка премиум-статуса
 
